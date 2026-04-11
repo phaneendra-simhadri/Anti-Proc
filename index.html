@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>AntiProc &ndash; Plus Ultra Execution System</title>
+  <!-- Non-blocking font load -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload"
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Exo+2:wght@400;500;600;700;800;900&family=Orbitron:wght@400;600;700;800;900&display=swap"
+    as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Exo+2:wght@400;500;600;700;800;900&family=Orbitron:wght@400;600;700;800;900&display=swap"
+      rel="stylesheet" />
+  </noscript>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+  <!-- ════ Login Screen ════ -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-bg-art" aria-hidden="true"></div>
+    <div class="login-box">
+      <div class="login-logo">&#9889;</div>
+      <h1 class="login-title">AntiProc</h1>
+      <p class="login-subtitle">Anti-Procrastination Execution System</p>
+      <p class="login-tagline">Sign in to sync your progress across all devices &mdash; laptop, mobile, anywhere.</p>
+      <button id="loginGoogleBtn" class="login-google-btn" type="button">
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+          <path fill="#4285F4"
+            d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" />
+          <path fill="#34A853"
+            d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" />
+          <path fill="#FBBC05"
+            d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" />
+          <path fill="#EA4335"
+            d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" />
+        </svg>
+        Continue with Google
+      </button>
+      <button id="loginOfflineBtn" class="login-offline-btn" type="button">Use offline (no sync)</button>
+      <p class="login-note">Your data is private &mdash; only you can see it.</p>
+    </div>
+  </div>
+
+  <!-- ════ Main App (hidden until login) ════ -->
+  <div id="mainApp" style="display:none">
+
+    <!-- ════ Full-Page Background Art ════ -->
+    <div class="page-bg-art" aria-hidden="true"></div>
+
+    <!-- ════ Left Decoration Panel ════ -->
+    <aside class="left-deco" aria-hidden="true">
+      <div class="ld-row" style="--r:-8deg">
+        <span class="ld-dim">&#9889;</span>
+        <span class="ld-label">ONE FOR ALL</span>
+        <span class="ld-dim">&#9889;</span>
+      </div>
+      <div class="ld-row ld-hero" style="--r:6deg">
+        <span>PLUS ULTRA</span>
+      </div>
+      <div class="ld-row" style="--r:-5deg">
+        <span class="ld-label">IZUKU MIDORIYA</span>
+      </div>
+      <div class="ld-row ld-small" style="--r:9deg">
+        <span class="ld-dim">HERO&nbsp;&nbsp;RANK&nbsp;&nbsp;#&infin;</span>
+      </div>
+      <div class="ld-row ld-highlight" style="--r:-7deg">
+        <span>&#9889;&nbsp;SURPASS YOUR LIMITS&nbsp;&#9889;</span>
+      </div>
+    </aside>
+
+    <!-- ════ Toast ════ -->
+    <div id="toastContainer" aria-live="polite"></div>
+
+    <!-- ════ Chart Tooltip ════ -->
+    <div id="anTooltip" class="an-tooltip" style="display:none;pointer-events:none;position:fixed;z-index:9999;"></div>
+
+    <!-- ════ Custom Modal ════ -->
+    <div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true">
+      <div class="modal-box">
+        <p id="modalTitle" class="modal-title"></p>
+        <p id="modalBody" class="modal-body muted"></p>
+        <div id="modalInputWrap" class="modal-input-wrap">
+          <input id="modalInput" type="text" autocomplete="off" />
+        </div>
+        <div class="modal-actions">
+          <button id="modalCancel" type="button" class="outline">Cancel</button>
+          <button id="modalConfirm" type="button" class="danger">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ Cell Tooltip ════ -->
+    <div id="cellTooltip" class="cell-tooltip" role="tooltip"></div>
+
+    <main class="container">
+
+      <!-- ════ Header ════ -->
+      <header class="header" id="sec-header">
+        <div class="header-left">
+          <div class="logo-row">
+            <span class="logo-mark">&#9889;</span>
+            <h1>AntiProc</h1>
+          </div>
+          <p class="apex-abbr"><span class="apex-letter">Anti</span>-<span class="apex-letter">Proc</span>rastination
+            Execution System</p>
+          <p id="headerGreeting" class="header-sub">One For All &mdash; Execute. Improve. Surpass.</p>
+        </div>
+        <div class="header-right">
+          <div class="header-meta">
+            <div class="countdown-block">
+              <span class="meta-label">Day ends in</span>
+              <span id="countdown" class="countdown-time">&#8211;</span>
+            </div>
+            <div class="date-block">
+              <span class="meta-label">Today</span>
+              <span id="todayLabel" class="today-badge"></span>
+            </div>
+          </div>
+          <div class="header-btns">
+            <button id="syncLoginBtn" class="sync-login-btn" type="button"
+              title="Sign in with Google to sync your data across all devices">&#9729; Sync</button>
+            <span id="syncStatusDot" class="sync-dot sync-offline" title="Not signed in — local only"></span>
+            <button id="showGuideBtn" class="help-btn" type="button" title="Show how AntiProc works">&#9432;
+              Guide</button>
+            <button id="quotesToggleBtn" class="quotes-toggle-btn" type="button"
+              title="Read hero quotes for motivation">&#9889; Hero Quotes</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Sync dropdown — outside header to escape backdrop-filter stacking context -->
+      <div id="syncDropdown" class="sync-dropdown" hidden>
+        <span id="syncDropdownEmail" class="sync-dropdown-email"></span>
+        <button id="syncSignOutBtn" class="sync-signout-btn" type="button">&#x2192; Sign out</button>
+      </div>
+
+      <!-- ════ Deku Hero Panel ════ -->
+      <div id="dekuPanel" class="card deku-panel" style="display:none">
+        <div class="deku-scan-line" aria-hidden="true"></div>
+        <div class="deku-corner-mark top-left" aria-hidden="true"></div>
+        <div class="deku-corner-mark top-right" aria-hidden="true"></div>
+        <div class="deku-corner-mark bot-left" aria-hidden="true"></div>
+        <div class="deku-corner-mark bot-right" aria-hidden="true"></div>
+        <div class="deku-quote-section">
+          <div class="deku-quote-left">
+            <span class="deku-badge">HERO FILE &mdash; DEKU No.&#9312;</span>
+            <blockquote id="dekuQuoteText" class="deku-quote-text"></blockquote>
+            <cite class="deku-quote-author">&mdash; Izuku &ldquo;Deku&rdquo; Midoriya, One For All User</cite>
+            <div id="dekuQuoteDots" class="deku-quote-dots"></div>
+          </div>
+          <div class="deku-img-wrap">
+            <img src="deku1.png" alt="Deku &mdash; OFA Full Power" class="deku-img deku-img-main" loading="lazy"
+              onerror="this.style.display='none'" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ How APEX Works Guide ════ -->
+      <div id="guidePanel" class="card guide-panel">
+        <div class="guide-header">
+          <div class="guide-header-left">
+            <span class="guide-icon">&#9889;</span>
+            <div>
+              <h2 class="guide-title">One For All &mdash; How AntiProc Works</h2>
+              <p class="muted small">Deku didn&apos;t become the greatest hero by half-trying. Neither will you. Read
+                the rules once. Follow them always.</p>
+            </div>
+          </div>
+          <button id="guideDismissBtn" class="outline btn-sm" type="button">Got it &times;</button>
+        </div>
+        <div class="guide-rules">
+          <div class="guide-rule">
+            <span class="guide-rule-num">01</span>
+            <div>
+              <strong>3 Non-Negotiable Targets</strong>
+              <p>Like Deku&apos;s training regimes &mdash; 3 new tasks for today. All done before midnight. Mark
+                incomplete tasks <strong>↩ Carry</strong> to bring them to tomorrow.</p>
+            </div>
+          </div>
+          <div class="guide-rule">
+            <span class="guide-rule-num">02</span>
+            <div>
+              <strong>Finalize &amp; Lock Results</strong>
+              <p>Click &ldquo;Finalize Day&rdquo; to lock in. <span class="guide-ok">All 3 done</span> &rarr; streak
+                extends, +30 XP. <span class="guide-danger">Any missed</span> &rarr; streak resets, &minus;20 XP,
+                penalty +15.</p>
+            </div>
+          </div>
+          <div class="guide-rule">
+            <span class="guide-rule-num">03</span>
+            <div>
+              <strong>Deep Work Blocks (60&ndash;90 min)</strong>
+              <p>One For All requires full commitment. Log your training sessions: planned vs actual minutes. Efficiency
+                = (actual &divide; planned) &minus; interruption cost.</p>
+            </div>
+          </div>
+          <div class="guide-rule">
+            <span class="guide-rule-num">04</span>
+            <div>
+              <strong>Streak, XP &amp; Hero Rank</strong>
+              <p>Consecutive perfect days grow your streak (OFA glow at 3+). XP unlocks ranks: Quirkless &rarr; U.A.
+                Hopeful &rarr; Hero Course &rarr; ... &rarr; Symbol of Peace.</p>
+            </div>
+          </div>
+          <div class="guide-rule">
+            <span class="guide-rule-num">05</span>
+            <div>
+              <strong>Weekly Debrief (every 7 days)</strong>
+              <p>After every 7 finalized days, a debrief unlocks — like Deku&apos;s notebooks. Write honestly: what you
+                executed, where you failed, what changes next week.</p>
+            </div>
+          </div>
+          <div class="guide-rule">
+            <span class="guide-rule-num">&#128190;</span>
+            <div>
+              <strong>Data &amp; Backup</strong>
+              <p>All data lives in your browser&apos;s localStorage. <strong>Export</strong> saves a JSON backup.
+                <strong>Import</strong> restores it. <strong>Reset</strong> requires typing &ldquo;RESET&rdquo; to
+                prevent accidents.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ Stats ════ -->
+      <section class="stats-grid" id="sec-stats" aria-label="Discipline stats">
+
+        <article class="card stat streak-card">
+          <div class="stat-icon">&#128293;</div>
+          <h2>Streak</h2>
+          <p id="streakValue">0 days</p>
+          <span id="bestStreakLabel" class="stat-sub"></span>
+          <button id="shieldBtn" class="shield-btn" type="button"
+            title="Spend 50 XP to restore your streak after a missed day">&#128293; Restore Streak (50 XP)</button>
+        </article>
+
+        <article class="card stat xp-card">
+          <div class="stat-icon">&#9889;</div>
+          <h2>XP</h2>
+          <p id="xpValue">0</p>
+          <div class="xp-bar-wrap">
+            <div id="xpBar" class="xp-bar"></div>
+          </div>
+          <span id="xpToNext" class="stat-sub"></span>
+        </article>
+
+        <article class="card stat level-card" id="levelCard" role="button" tabindex="0" title="Click to see all ranks">
+          <div class="stat-icon">&#127942;</div>
+          <h2>Level <span class="level-card-hint">&#9660;</span></h2>
+          <p id="levelValue">1</p>
+          <span id="levelName" class="stat-sub level-name"></span>
+        </article>
+
+        <article class="card stat penalty-card">
+          <div class="stat-icon">&#128683;</div>
+          <h2>Penalty</h2>
+          <p id="penaltyValue">0</p>
+          <span class="stat-sub">pts deducted</span>
+        </article>
+
+      </section>
+
+      </section>
+
+      <!-- ════ Redemption Quests ════ -->
+      <section class="card redemption-card" id="redemptionCard" style="display:none">
+        <div class="section-header">
+          <div class="section-title-group">
+            <span class="section-num" style="color:var(--danger)">&#9888;</span>
+            <div>
+              <h2>&#128293; Redemption Quests</h2>
+              <p class="section-desc" id="redemptionSub">Complete quests below to reduce your penalty</p>
+            </div>
+          </div>
+        </div>
+        <div id="redemptionQuestList" class="redeem-quest-list"></div>
+      </section>
+
+      <!-- ════ 01: Daily Tasks ════ -->
+      <section class="card section-card" id="sec-tasks">
+        <div class="section-header">
+          <div class="section-title-group">
+            <span class="section-num">01</span>
+            <div>
+              <h2>&#9889; Today&rsquo;s 3 Non-Negotiable Targets</h2>
+              <p class="section-desc">Choose 3 training objectives. Complete all before midnight. Hit ✏ to edit, ↩ to
+                carry forward.</p>
+            </div>
+          </div>
+          <div class="progress-ring-wrap" aria-label="Task completion">
+            <svg class="progress-ring" viewBox="0 0 44 44" fill="none">
+              <circle class="ring-bg" cx="22" cy="22" r="18" />
+              <circle id="ringFill" class="ring-fill" cx="22" cy="22" r="18" />
+            </svg>
+            <span id="ringLabel" class="ring-label">0/3</span>
+          </div>
+        </div>
+
+        <form id="taskForm" class="add-task-form">
+          <input id="taskInput" type="text" maxlength="100" placeholder="Describe your mandatory task&hellip;"
+            autocomplete="off" required />
+          <select id="taskCategory" aria-label="Task category">
+            <!-- populated dynamically from state.categories -->
+          </select>
+          <button type="button" id="editCatsBtn" class="btn-edit-cats" title="Edit categories">&#9998;</button>
+          <button type="submit">+ Add</button>
+        </form>
+
+        <!-- Category editor (shown/hidden by editCatsBtn) -->
+        <div id="catEditor" class="cat-editor" style="display:none">
+          <div class="cat-editor-header">
+            <span class="cat-editor-title">Edit Categories</span>
+            <button type="button" id="catCloseBtn" class="cat-close-btn" title="Close">&times;</button>
+          </div>
+          <div id="catTags" class="cat-tags"></div>
+          <div class="cat-add-row">
+            <input id="catNewInput" type="text" maxlength="24" placeholder="New category name&hellip;"
+              autocomplete="off" />
+            <button type="button" id="catAddBtn" class="btn-sm">+ Add</button>
+          </div>
+        </div>
+
+        <p id="taskHint" class="hint-text"></p>
+        <ul id="taskList" class="task-list" aria-label="Today's targets"></ul>
+
+        <div id="taskEmptyState" class="empty-state">
+          <span class="empty-icon">&#9889;</span>
+          <p>No targets yet &mdash; set your 3 training objectives above.</p>
+        </div>
+
+        <button id="lockDayBtn" class="finalize-btn" type="button" disabled>
+          &#9889;&nbsp; Finalize Day &mdash; PLUS ULTRA!
+        </button>
+
+        <div id="dayLockedBanner" class="day-locked-banner" style="display:none">
+          <span class="day-locked-icon">&#128274;</span>
+          <div>
+            <strong id="dayLockedTitle">Day Locked</strong>
+            <span id="dayLockedSub">Today&rsquo;s session is finalized.</span>
+          </div>
+        </div>
+
+        <!-- Tomorrow's queue — visible after finalization -->
+        <div id="tomorrowQueueSection" style="display:none">
+          <div class="tomorrow-queue-header">
+            <span class="tomorrow-queue-title">&#127749; Tomorrow&rsquo;s Plan</span>
+            <span id="tomorrowQueueCount" class="tomorrow-queue-count">0 / 3 slots</span>
+          </div>
+          <ul id="tomorrowQueueList" class="task-list" aria-label="Tomorrow's tasks"></ul>
+          <p id="tomorrowQueueEmpty" class="muted small dp-empty" style="display:none">
+            No tasks queued yet &mdash; use the form above to plan tomorrow.
+          </p>
+        </div>
+      </section>
+
+      <!-- ════ 02: Focus Timer ════ -->
+      <section class="card section-card" id="sec-timer">
+        <div class="section-header">
+          <div class="section-title-group">
+            <span class="section-num">02</span>
+            <div>
+              <h2>&#9889; Focus Timer</h2>
+              <p class="section-desc">Activate One For All. Start a deep work block. Auto-logs when you stop.</p>
+            </div>
+          </div>
+          <span id="timerStatusBadge" class="status-badge">Idle</span>
+        </div>
+
+        <div class="timer-block">
+          <label class="field-label timer-label-row">
+            <span>Session label <span class="optional-tag">optional</span></span>
+            <input id="timerNote" type="text" maxlength="120" placeholder="e.g. LeetCode Graph Problems"
+              autocomplete="off" />
+          </label>
+
+          <div class="timer-main-row">
+            <div class="timer-display-col">
+              <div id="timerDisplay" class="timer-display">00:00:00</div>
+              <div class="timer-progress-wrap">
+                <div id="timerProgressBar" class="timer-progress-bar"></div>
+              </div>
+              <div class="timer-pct-row">
+                <span id="timerProgressPct" class="timer-pct">0%</span>
+                <span class="timer-pct-label">completed</span>
+              </div>
+            </div>
+            <div class="timer-meta-col">
+              <div class="timer-meta-item">
+                <span class="timer-meta-label">Target</span>
+                <span id="timerTargetVal" class="timer-meta-val">90 min (OFA)</span>
+              </div>
+              <div class="timer-meta-item">
+                <span class="timer-meta-label">Mode</span>
+                <span id="timerModeVal" class="timer-meta-val">&#9889; Plus Ultra</span>
+              </div>
+              <div class="timer-meta-item">
+                <span class="timer-meta-label">Today</span>
+                <span id="todayFocusVal" class="timer-meta-val">0 min</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="timer-mode-row">
+            <button id="modeOfa" class="timer-mode-btn active" type="button"
+              title="90 minute OFA deep work block">&#9889; OFA 90min</button>
+            <button id="modePomo" class="timer-mode-btn" type="button" title="25 minute Pomodoro sprint">&#127813;
+              Pomodoro 25min</button>
+          </div>
+
+          <div class="timer-custom-row">
+            <label class="timer-custom-label">Custom:</label>
+            <input id="timerCustomMins" type="number" min="1" max="480" placeholder="min" class="timer-custom-input" />
+            <button id="timerCustomSetBtn" type="button" class="timer-mode-btn">Set</button>
+          </div>
+
+          <!-- Break countdown (auto-shows after Pomodoro completes) -->
+          <div id="breakTimerWrap" class="break-timer" style="display:none">
+            <span class="break-timer-icon">&#9749;</span>
+            <span class="break-timer-label">Break:</span>
+            <span id="breakTimerCount" class="break-timer-count">05:00</span>
+            <button id="skipBreakBtn" type="button" class="btn-sm outline">Skip &rarr;</button>
+          </div>
+
+          <div class="timer-controls">
+            <button id="timerStartBtn" type="button">&#9654;&nbsp;Start</button>
+            <button id="timerPauseBtn" type="button" class="outline" disabled>&#9646;&#9646;&nbsp;Pause</button>
+            <button id="timerStopBtn" type="button" class="danger" disabled>&#9632;&nbsp;Stop &amp; Log</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════ 03: Manual Log ════ -->
+      <section class="card section-card" id="sec-log">
+        <div class="section-header">
+          <div class="section-title-group">
+            <span class="section-num">03</span>
+            <div>
+              <h2>&#128203; Manual Training Log</h2>
+              <p class="section-desc">Log sessions not captured by the timer above. Every rep counts.</p>
+            </div>
+          </div>
+        </div>
+
+        <form id="focusForm" class="focus-form">
+          <label class="field-label">
+            Start time <span class="optional-tag">when you began</span>
+            <input id="focusStartTime" type="time" />
+          </label>
+          <label class="field-label">
+            Planned min <span class="optional-tag">1&ndash;300</span>
+            <input id="plannedMinutes" type="number" min="1" max="300" placeholder="75" required />
+          </label>
+          <label class="field-label">
+            Actual focused min
+            <input id="actualMinutes" type="number" min="0" max="300" placeholder="70" required />
+          </label>
+          <label class="field-label">
+            Interruptions
+            <input id="interruptions" type="number" min="0" placeholder="0" required />
+          </label>
+          <label class="field-label">
+            Note <span class="optional-tag">optional</span>
+            <input id="focusNote" type="text" maxlength="120" placeholder="What did you execute?" autocomplete="off" />
+          </label>
+          <button type="submit" class="log-btn">Log Session</button>
+        </form>
+
+        <ul id="focusList" class="compact-list scrollable" aria-label="Focus sessions"></ul>
+        <div id="focusEmptyState" class="empty-state">
+          <span class="empty-icon">&#128337;</span>
+          <p>No sessions logged yet. Use the timer above or log manually.</p>
+        </div>
+      </section>
+
+      <!-- ════ 04: Dashboard ════ -->
+      <section class="card section-card" id="sec-dashboard">
+        <div class="section-header">
+          <div class="section-title-group">
+            <span class="section-num">04</span>
+            <div>
+              <h2>&#128200; Hero Progress Dashboard</h2>
+              <p class="section-desc">20 weeks of your discipline. Green = OFA activated. Red = quirk failed.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="legend-row">
+          <span class="legend-dot completed"></span><span>Completed</span>
+          <span class="legend-dot partial"></span><span>Partial</span>
+          <span class="legend-dot missed"></span><span>Missed</span>
+          <span class="legend-dot neutral"></span><span>No record</span>
+        </div>
+
+        <div class="heatmap-scroll">
+          <div id="heatmap" class="heatmap" aria-label="Daily consistency heatmap"></div>
+        </div>
+
+        <div id="heatmapEmptyState" class="empty-state">
+          <span class="empty-icon">&#128640;</span>
+          <p>Your heatmap grows as you complete and finalize days.</p>
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-card" id="weeklySummaryBlock"></div>
+          <div class="summary-card" id="monthlySummaryBlock"></div>
+        </div>
+
+        <div class="cat-chart-wrap">
+          <h3 class="cat-chart-title">&#9889; Tasks Completed by Category</h3>
+          <canvas id="catChart" class="cat-chart-canvas"></canvas>
+          <p id="catChartEmpty" class="muted small" style="text-align:center;display:none">Finalize days with completed
+            tasks to see the breakdown.</p>
+        </div>
+      </section>
+
+      <!-- ════ 06: Battle History ════ -->
+      <section class="card section-card" id="sec-history">
+        <div class="section-header">
+          <div class="section-title-group">
+            <span class="section-num">06</span>
+            <div>
+              <h2>&#128203; Battle History</h2>
+              <p class="section-desc">Full record of every finalized day and focus session.</p>
+            </div>
+          </div>
+          <button id="exportCsvBtn" class="outline btn-sm" type="button">&#11123; Export CSV</button>
+        </div>
+
+        <div class="hist-tabs" role="tablist">
+          <button class="hist-tab active" data-tab="days" role="tab">&#128197; Day Logs</button>
+          <button class="hist-tab" data-tab="focus" role="tab">&#9889; Focus Sessions</button>
+        </div>
+
+        <!-- Date filter bar -->
+        <div class="hist-filter-bar">
+          <div class="hist-filter-presets">
+            <button class="hist-preset-btn active" data-preset="today" type="button">Today</button>
+            <button class="hist-preset-btn" data-preset="7d" type="button">7 Days</button>
+            <button class="hist-preset-btn" data-preset="30d" type="button">30 Days</button>
+            <button class="hist-preset-btn" data-preset="90d" type="button">90 Days</button>
+            <button class="hist-preset-btn" data-preset="all" type="button">All</button>
+          </div>
+          <div class="hist-filter-range">
+            <label class="hist-filter-label">From
+              <input id="histFromDate" type="date" class="hist-date-input" />
+            </label>
+            <span class="hist-filter-sep">&rarr;</span>
+            <label class="hist-filter-label">To
+              <input id="histToDate" type="date" class="hist-date-input" />
+            </label>
+            <button id="histClearFilter" class="hist-clear-btn" type="button" title="Clear filter">&times;
+              Clear</button>
+          </div>
+          <span id="histResultCount" class="hist-result-count"></span>
+        </div>
+
+        <!-- Tab: Day Logs -->
+        <div id="histTabDays" class="hist-panel active">
+          <div id="histDaysList" class="hist-table" role="list"></div>
+          <div id="histDaysEmpty" class="empty-state">
+            <span class="empty-icon">&#128197;</span>
+            <p>No finalized days yet. Finalize your first day to start your battle record.</p>
+          </div>
+        </div>
+
+        <!-- Tab: Focus Sessions -->
+        <div id="histTabFocus" class="hist-panel">
+          <div id="histFocusList" class="hist-table" role="list"></div>
+          <div id="histFocusEmpty" class="empty-state">
+            <span class="empty-icon">&#9889;</span>
+            <p>No focus sessions logged yet.</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ════ 07: Focus Analytics ════ -->
+      <section class="card section-card" id="sec-analytics">
+        <div class="section-header">
+          <div class="section-title-group">
+            <span class="section-num">07</span>
+            <div>
+              <h2>&#128202; Focus Analytics</h2>
+              <p class="section-desc">Your training time, visualised &mdash; daily totals, weekly trends &amp;
+                efficiency patterns.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary stat pills -->
+        <div class="an-stats-row">
+          <div class="an-stat-pill an-pill-1">
+            <span class="an-stat-label">Total Focus Time</span>
+            <span id="anTotalTime" class="an-stat-val">&#8212;</span>
+            <span id="anTrend1" class="an-trend"></span>
+          </div>
+          <div class="an-stat-pill an-pill-2">
+            <span class="an-stat-label">Avg per Focus Day</span>
+            <span id="anAvgDay" class="an-stat-val">&#8212;</span>
+            <span id="anTrend2" class="an-trend"></span>
+          </div>
+          <div class="an-stat-pill an-pill-3">
+            <span class="an-stat-label">Best Single Day</span>
+            <span id="anBestDay" class="an-stat-val">&#8212;</span>
+          </div>
+          <div class="an-stat-pill an-pill-4">
+            <span class="an-stat-label">Best Week</span>
+            <span id="anBestWeek" class="an-stat-val">&#8212;</span>
+          </div>
+          <div class="an-stat-pill an-pill-5">
+            <span class="an-stat-label">Avg Efficiency</span>
+            <span id="anAvgEff" class="an-stat-val">&#8212;</span>
+            <span id="anTrend5" class="an-trend"></span>
+          </div>
+          <div class="an-stat-pill an-pill-6">
+            <span class="an-stat-label">Days w/ Focus</span>
+            <span id="anFocusDays" class="an-stat-val">&#8212;</span>
+          </div>
+          <div class="an-stat-pill an-pill-7">
+            <span class="an-stat-label">Total Sessions</span>
+            <span id="anTotalSessions" class="an-stat-val">&#8212;</span>
+          </div>
+          <div class="an-stat-pill an-pill-8">
+            <span class="an-stat-label">Focus Streak</span>
+            <span id="anFocusStreak" class="an-stat-val">&#8212;</span>
+          </div>
+          <div class="an-stat-pill an-pill-9">
+            <span class="an-stat-label">Consistency (30d)</span>
+            <span id="anConsistency" class="an-stat-val">&#8212;</span>
+          </div>
+        </div>
+
+        <!-- Daily bar chart -->
+        <div class="an-chart-block">
+          <div class="an-chart-header">
+            <span class="an-chart-title">&#9889; Daily Focus Time <span class="an-chart-sub">— actual minutes logged per
+                day</span></span>
+            <div class="an-range-btns">
+              <button class="an-range-btn active" data-range="14" type="button">14 days</button>
+              <button class="an-range-btn" data-range="30" type="button">30 days</button>
+            </div>
+          </div>
+          <div class="an-canvas-wrap">
+            <canvas id="anDailyCanvas"></canvas>
+          </div>
+          <p id="anDailyEmpty" class="muted small an-empty" style="display:none">Log focus sessions to see your daily
+            chart.</p>
+        </div>
+
+        <!-- Weekly totals bar chart -->
+        <div class="an-chart-block">
+          <div class="an-chart-header">
+            <span class="an-chart-title">&#128197; Weekly Focus Totals <span class="an-chart-sub">— last 8
+                weeks</span></span>
+          </div>
+          <div class="an-canvas-wrap">
+            <canvas id="anWeeklyCanvas"></canvas>
+          </div>
+          <p id="anWeeklyEmpty" class="muted small an-empty" style="display:none">Log focus sessions to see your weekly
+            chart.</p>
+        </div>
+
+        <!-- Efficiency trend line chart -->
+        <div class="an-chart-block">
+          <div class="an-chart-header">
+            <span class="an-chart-title">&#127919; Efficiency Trend <span class="an-chart-sub">&mdash; smooth line +
+                5-session moving average</span></span>
+            <div class="an-range-btns">
+              <button class="an-eff-btn active" data-eff="20" type="button">Last 20</button>
+              <button class="an-eff-btn" data-eff="50" type="button">Last 50</button>
+              <button class="an-eff-btn" data-eff="0" type="button">All</button>
+            </div>
+          </div>
+          <div class="an-eff-legend">
+            <span><span class="an-eff-dot" style="background:#3ddc84"></span>&ge;70% High</span>
+            <span><span class="an-eff-dot" style="background:#60a5fa"></span>45&ndash;69% Mid</span>
+            <span><span class="an-eff-dot" style="background:#ef4444"></span>&lt;45% Low</span>
+            <span><span class="an-eff-dot"
+                style="background:rgba(255,213,0,0.85);border-radius:2px;width:18px;height:3px;display:inline-block;vertical-align:middle"></span>Moving
+              avg</span>
+          </div>
+          <div class="an-canvas-wrap">
+            <canvas id="anEffCanvas"></canvas>
+          </div>
+          <p id="anEffEmpty" class="muted small an-empty" style="display:none">Log focus sessions to see efficiency
+            trends.</p>
+        </div>
+
+        <!-- Day-of-week analysis chart -->
+        <div class="an-chart-block">
+          <div class="an-chart-header">
+            <span class="an-chart-title">&#128197; Day-of-Week Analysis <span class="an-chart-sub">&mdash; avg focus
+                minutes per weekday</span></span>
+          </div>
+          <div class="an-canvas-wrap">
+            <canvas id="anDowCanvas"></canvas>
+          </div>
+          <p id="anDowEmpty" class="muted small an-empty" style="display:none">Log focus sessions to see day-of-week
+            patterns.</p>
+        </div>
+
+        <!-- Best focus hours chart -->
+        <div class="an-chart-block">
+          <div class="an-chart-header">
+            <span class="an-chart-title">&#9200; Best Focus Hours <span class="an-chart-sub">&mdash; total minutes
+                logged per hour of day</span></span>
+          </div>
+          <div class="an-canvas-wrap">
+            <canvas id="anHourCanvas"></canvas>
+          </div>
+          <p id="anHourEmpty" class="muted small an-empty" style="display:none">Add a start time to your focus sessions
+            to see peak hours.</p>
+        </div>
+      </section>
+
+      <!-- ════ Persist Bar ════ -->
+      <div class="persist-bar card">
+        <div class="persist-left">
+          <span class="persist-dot" id="persistDot"></span>
+          <span id="persistStatus" class="persist-status">Checking storage&hellip;</span>
+        </div>
+        <div class="persist-actions">
+          <button id="exportBtn" type="button" class="outline btn-sm">&#128190; Export</button>
+          <label class="btn-label btn-sm" for="importFile">&#128229; Import</label>
+          <input type="file" id="importFile" accept=".json" style="display:none" />
+          <button id="resetBtn" type="button" class="danger btn-sm">&#128465; Reset</button>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ════ Section Sidebar Nav ════ -->
+    <nav class="side-nav" aria-label="Section navigation">
+      <a class="side-nav-item" href="#sec-header" data-section="sec-header">AntiProc</a>
+      <a class="side-nav-item" href="#sec-stats" data-section="sec-stats">Stats</a>
+      <a class="side-nav-item" href="#sec-tasks" data-section="sec-tasks">Targets</a>
+      <a class="side-nav-item" href="#sec-timer" data-section="sec-timer">Timer</a>
+      <a class="side-nav-item" href="#sec-log" data-section="sec-log">Training Log</a>
+      <a class="side-nav-item" href="#sec-dashboard" data-section="sec-dashboard">Dashboard</a>
+      <a class="side-nav-item" href="#sec-history" data-section="sec-history">History</a>
+      <a class="side-nav-item" href="#sec-analytics" data-section="sec-analytics">Analytics</a>
+    </nav>
+
+    <footer class="site-footer">
+      <div class="footer-main">Made by <strong>Phaneendra Simhadri</strong></div>
+      <a href="https://phaneendra-simhadri.vercel.app" target="_blank" rel="noopener"
+        class="footer-portfolio-btn">&#127760; Portfolio</a>
+      <div class="footer-sub">
+        <span class="footer-inspired">Inspired by <strong>Izuku &ldquo;Deku&rdquo; Midoriya</strong></span>
+        <span class="footer-divider">&#9889;</span>
+        <span class="footer-plus-ultra">PLUS ULTRA</span>
+      </div>
+      <div class="footer-version">v2.3</div>
+    </footer>
+
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- ════ Level Map Modal ════ -->
+    <div id="levelMapOverlay" class="lmap-overlay" role="dialog" aria-modal="true" aria-label="Hero Rank Progression">
+      <div class="lmap-box">
+        <div class="lmap-header">
+          <span class="lmap-title">&#9889; Hero Rank Progression</span>
+          <button id="levelMapClose" class="lmap-close" type="button" aria-label="Close">&times;</button>
+        </div>
+        <p class="lmap-subtitle">100 XP per level &mdash; complete tasks, grow your streak</p>
+        <div id="levelMapList" class="lmap-list"></div>
+      </div>
+    </div>
+
+    <script src="app.js" type="module"></script>
+    <script>
+      // Inline scroll-spy — runs regardless of app.js cache
+      (function () {
+        function runSpy() {
+          var ids = ['sec-header', 'sec-stats', 'sec-tasks', 'sec-timer', 'sec-log', 'sec-dashboard', 'sec-history', 'sec-analytics'];
+          var items = document.querySelectorAll('.side-nav-item');
+          if (!items.length) return;
+          var threshold = window.innerHeight * 0.45;
+          var active = ids[0];
+          for (var i = 0; i < ids.length; i++) {
+            var el = document.getElementById(ids[i]);
+            if (el && el.getBoundingClientRect().top <= threshold) active = ids[i];
+          }
+          items.forEach(function (a) {
+            a.classList.toggle('active', a.dataset.section === active);
+          });
+        }
+        window.addEventListener('scroll', runSpy, { passive: true });
+        setInterval(runSpy, 300);
+        runSpy();
+        setTimeout(runSpy, 300);
+        setTimeout(runSpy, 800);
+      })();
+    </script>
+  </div><!-- end #mainApp -->
+</body>
+
+</html>
